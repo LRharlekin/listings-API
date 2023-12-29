@@ -31,10 +31,6 @@ UserSchema.pre("save", async function (next) {
   next();
 });
 
-UserSchema.methods.getName = function () {
-  return this.name;
-};
-
 UserSchema.methods.createJWT = function () {
   return jwt.sign(
     { userID: this._id, name: this.name },
@@ -45,7 +41,7 @@ UserSchema.methods.createJWT = function () {
   );
 };
 
-UserSchema.methods.comparePassword = async function (passwordCandidate) {
+UserSchema.methods.checkPassword = async function (passwordCandidate) {
   // bcrypt.compare(passwordCandidate, hash)
   const isMatch = await bcrypt.compare(passwordCandidate, this.password);
   return isMatch;

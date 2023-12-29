@@ -35,7 +35,7 @@ const register = async (req, res) => {
   //   throw new BadRequestError("Please provide name, email and password.");
   // }
 
-  // See User model: This will pass through mongoose pre-save middleware, where hashing is done.
+  // See User model: Before .create() this will pass through mongoose pre-save middleware, where hashing is done.
   const user = await User.create({ ...req.body });
 
   const token = user.createJWT();
@@ -72,7 +72,7 @@ const login = async (req, res) => {
   if (!user) {
     throw new UnauthorizedError("Invalid email credentials.");
   }
-  const passwordIsCorrect = await user.comparePassword(password);
+  const passwordIsCorrect = await user.checkPassword(password);
   if (!passwordIsCorrect) {
     throw new UnauthorizedError("Invalid pw credentials.");
   }

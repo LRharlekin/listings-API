@@ -5,7 +5,7 @@ const getListing = async (req, res) => {
   res.send("get listing");
 };
 const createListing = async (req, res) => {
-  res.send("create a listing");
+  res.json(req.user);
 };
 const updateListing = async (req, res) => {
   res.send("update or edit a listing");
