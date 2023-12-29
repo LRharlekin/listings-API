@@ -1,7 +1,8 @@
 const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError } = require("../errors");
-const bcrypt = require("bcryptjs");
+// const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 /* 
 #### Register User
@@ -37,7 +38,15 @@ const register = async (req, res) => {
   // See User model: This will pass through mongoose pre-save middleware, where hashing is done.
   const user = await User.create({ ...req.body });
 
-  res.status(StatusCodes.CREATED).json({ user });
+  const token = jwt.sign(
+    { userID: user._id, name: user.name },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "30d",
+    }
+  );
+
+  res.status(StatusCodes.CREATED).json({ user: { name: user.name }, token });
 };
 
 /* 
