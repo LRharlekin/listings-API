@@ -38,13 +38,14 @@ const register = async (req, res) => {
   // See User model: This will pass through mongoose pre-save middleware, where hashing is done.
   const user = await User.create({ ...req.body });
 
-  const token = jwt.sign(
-    { userID: user._id, name: user.name },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: "30d",
-    }
-  );
+  const token = user.createJWT();
+  // const token = jwt.sign(
+  //   { userID: user._id, name: user.name },
+  //   process.env.JWT_SECRET,
+  //   {
+  //     expiresIn: "30d",
+  //   }
+  // );
 
   res.status(StatusCodes.CREATED).json({ user: { name: user.name }, token });
 };
