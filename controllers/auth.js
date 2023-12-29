@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
-const { BadRequestError } = require("../errors");
+const { BadRequestError, UnauthorizedError } = require("../errors");
 // const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -11,7 +11,7 @@ const jwt = require("jsonwebtoken");
 - if not valid > throw new BadRequestError
 - Hash pw (using bcryptjs)
 - Save user
-- Generate token
+- Generate token (from document instance method)
 - Send res with token
  */
 
@@ -56,14 +56,30 @@ const register = async (req, res) => {
 - Validate (email, pw) in controller
 - if invalid inputs > throw new BadRequestError
 - Find user
-- compare pw
+- compare pw (via document instance method)
 - if no match > throw new UnauthorizedError
-- if correct, generate token
+- if correct, generate token (from document instance method)
 - send res with token
  */
 
 const login = async (req, res) => {
-  res.send("login user");
+  const { email, password } = req.body;
+  if (!email || !password) {
+    throw new BadRequestError("Please provide email and password.");
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new UnauthorizedError("Invalid email credentials.");
+  }
+  const passwordIsCorrect = await user.comparePassword(password);
+  if (!passwordIsCorrect) {
+    throw new UnauthorizedError("Invalid pw credentials.");
+  }
+  const token = user.createJWT();
+
+  console.log("logging in...");
+  res.status(StatusCodes.OK).json({ user: { name: user.name }, token });
 };
 
 module.exports = {
