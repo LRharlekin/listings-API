@@ -15,17 +15,18 @@ const bcrypt = require("bcryptjs");
  */
 
 const register = async (req, res) => {
+  /* 
+  // IF HASHING WASN'T DONE IN PRE-HOOK MIDDLEWARE IN THE MODEL
   const { name, email, password } = req.body;
-  console.log(name, email, password);
-
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
-
   const tempUser = {
     name,
     email,
     password: hashedPassword,
   };
+  const user = await User.create({ ...tempUser });
+ */
 
   // ERROR HANDLING IN CONTROLLER IS REDUNDANT IN THIS CASE >> MONGOOSE VALIDATOR WILL DO IT
   // >> EDIT 500/error to represent actual 400-error / Bad Request
@@ -33,7 +34,9 @@ const register = async (req, res) => {
   //   throw new BadRequestError("Please provide name, email and password.");
   // }
 
-  const user = await User.create({ ...tempUser });
+  // See User model: This will pass through mongoose pre-save middleware, where hashing is done.
+  const user = await User.create({ ...req.body });
+
   res.status(StatusCodes.CREATED).json({ user });
 };
 
