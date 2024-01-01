@@ -11,8 +11,21 @@ const getAllListings = async (req, res) => {
   res.status(StatusCodes.OK).json({ listings, count: listings.length });
 };
 const getListing = async (req, res) => {
-  // req.body.createdBy = req.user.userID;
-  res.send("get listing");
+  // nested destructuring syntax!
+
+  const {
+    user: { userID },
+    // give the destructured listing ID an appropriate alias
+    params: { id: listingID },
+  } = req;
+  const listing = await Listing.findOne({
+    createdBy: userID,
+    _id: listingID,
+  });
+  if (!listing) {
+    throw new NotFoundError(`Didn't find listing with id: ${listingID}`);
+  }
+  res.status(StatusCodes.OK).json({ listing });
 };
 const createListing = async (req, res) => {
   req.body.createdBy = req.user.userID;
