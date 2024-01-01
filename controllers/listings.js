@@ -1,7 +1,7 @@
 const Listing = require("../models/Listing");
 const asyncWrapper = require("../middlewares/async-wrapper");
 const { StatusCodes } = require("http-status-codes");
-const { NotFoundError } = require("../errors");
+const { NotFoundError, BadRequestError } = require("../errors");
 
 const getAllListings = async (req, res) => {
   res.send("get all listings");
@@ -9,10 +9,13 @@ const getAllListings = async (req, res) => {
 const getListing = async (req, res) => {
   res.send("get listing");
 };
-const createListing = asyncWrapper(async (req, res) => {
+const createListing = async (req, res) => {
+  console.log(req.user);
+  req.body.createdBy = req.user.userID;
   const listingToAdd = await Listing.create(req.body);
   res.status(StatusCodes.CREATED).json({ listingToAdd });
-});
+};
+
 const updateListing = asyncWrapper(async (req, res) => {
   const { id: listingID } = req.params;
   const listing = await Listing.findByIdAndUpdate(listingID, req.body, {

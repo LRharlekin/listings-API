@@ -23,7 +23,7 @@ const ListingSchema = new mongoose.Schema(
       required: [true, "Please provide user."],
     },
   },
-  { timestamps: true }
+  { timestamps: true } // automatically adds createdAt and updatedAt properties with timestamps to instances of this model
 );
 
 module.exports = mongoose.model("Listing", ListingSchema);
