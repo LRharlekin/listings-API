@@ -4,13 +4,17 @@ const { StatusCodes } = require("http-status-codes");
 const { NotFoundError, BadRequestError } = require("../errors");
 
 const getAllListings = async (req, res) => {
-  res.send("get all listings");
+  // We're actually not looking for "A.L.L." the jobs, but only those associated with the authorized user
+  const listings = await Listing.find({ createdBy: req.user.userID }).sort(
+    "createdAt"
+  );
+  res.status(StatusCodes.OK).json({ listings, count: listings.length });
 };
 const getListing = async (req, res) => {
+  // req.body.createdBy = req.user.userID;
   res.send("get listing");
 };
 const createListing = async (req, res) => {
-  console.log(req.user);
   req.body.createdBy = req.user.userID;
   const listingToAdd = await Listing.create(req.body);
   res.status(StatusCodes.CREATED).json({ listingToAdd });
