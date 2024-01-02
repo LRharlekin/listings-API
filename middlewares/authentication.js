@@ -12,7 +12,7 @@ const auth = async (req, res, next) => {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("payload: ", payload);
+    console.log("auth middleware recognised user:", payload.name);
     // attach the user to the req before passing on to listings route
     req.user = {
       userID: payload.userID,

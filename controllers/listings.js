@@ -39,16 +39,32 @@ const getListing = async (req, res) => {
 
 // CRUD operation - UPDATE
 const updateListing = async (req, res) => {
-  res.send("update listing");
-  // const { id: listingID } = req.params;
-  // const listing = await Listing.findByIdAndUpdate(listingID, req.body, {
-  //   new: true,
-  //   runValidators: true,
-  // });
-  // if (!listing) {
-  //   throw new NotFoundError(`No listing with id: ${listingID} found.`);
-  // }
-  // res.status(StatusCodes.OK).json({ listing });
+  const {
+    body: { company, position },
+    user: { userID },
+    params: { id: listingID },
+  } = req;
+
+  if (company === "" || position === "") {
+    throw new BadRequestError("Company and Position fields cannot be empty.");
+  }
+
+  const listing = await Listing.findByIdAndUpdate(
+    { _id: listingID, createdBy: userID },
+    req.body,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  if (!listing) {
+    throw new NotFoundError(
+      `Couldn't find listing with id: ${listingID}. Update has failed.`
+    );
+  }
+
+  res.status(StatusCodes.OK).json({ listing });
 };
 
 // CRUD operation - DELETE
