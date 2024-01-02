@@ -49,7 +49,7 @@ const updateListing = async (req, res) => {
     throw new BadRequestError("Company and Position fields cannot be empty.");
   }
 
-  const listing = await Listing.findByIdAndUpdate(
+  const listingToUpdate = await Listing.findOneAndUpdate(
     { _id: listingID, createdBy: userID },
     req.body,
     {
@@ -58,18 +58,34 @@ const updateListing = async (req, res) => {
     }
   );
 
-  if (!listing) {
+  if (!listingToUpdate) {
     throw new NotFoundError(
       `Couldn't find listing with id: ${listingID}. Update has failed.`
     );
   }
 
-  res.status(StatusCodes.OK).json({ listing });
+  res.status(StatusCodes.OK).json({ listingToUpdate });
 };
 
 // CRUD operation - DELETE
 const deleteListing = async (req, res) => {
-  res.send("delete listing");
+  const {
+    user: { userID },
+    params: { id: listingID },
+  } = req;
+
+  const listingToDelete = await Listing.findOneAndDelete({
+    _id: listingID,
+    createdBy: userID,
+  });
+
+  if (!listingToDelete) {
+    throw new NotFoundError(
+      `Couldn't find listing with id: ${listingID}. No listing has been deleted.`
+    );
+  }
+
+  res.status(StatusCodes.OK).json({ listingToDelete });
 };
 
 module.exports = {
