@@ -85,7 +85,7 @@ const deleteListing = async (req, res) => {
     );
   }
 
-  res.status(StatusCodes.OK).json({ listingToDelete });
+  res.status(StatusCodes.OK).send();
 };
 
 module.exports = {
