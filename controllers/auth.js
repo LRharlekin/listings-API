@@ -38,6 +38,7 @@ const register = async (req, res) => {
   // See User model: Before .create() this will pass through mongoose pre-save middleware, where hashing is done.
   // await User.init();
   const { email: emailRaw } = req.body;
+  /* 
   const email = emailRaw.toLowerCase();
 
   const isNewUser = await User.isThisEmailUnique(email);
@@ -47,7 +48,7 @@ const register = async (req, res) => {
       `The email address ${emailRaw} is already in use, try sign-in.`
     );
   }
-
+ */
   const user = await User.create({ ...req.body });
 
   const token = user.createJWT();
@@ -75,11 +76,13 @@ const register = async (req, res) => {
  */
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
+  const { email: emailRaw, password } = req.body;
+
+  if (!emailRaw || !password) {
     throw new BadRequestError("Please provide email and password.");
   }
 
+  const email = emailRaw.toLowerCase();
   const user = await User.findOne({ email });
   if (!user) {
     throw new UnauthorizedError("Invalid email credentials.");
