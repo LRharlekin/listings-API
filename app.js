@@ -4,7 +4,7 @@ require("express-async-errors");
 /* security packages */
 const helmet = require('helmet');
 const cors require('cors');
-// const xss = require('xss-filters');
+const { xss } = require('express-xss-sanitizer');
 const rateLimiter = require("./middlewares/rate-limiter");
 
 const express = require("express");
@@ -23,12 +23,13 @@ const notFoundMiddleware = require("./middlewares/not-found");
 const errorHandlerMiddleware = require("./middlewares/error-handler");
 
 /* pre-hook middlewares */
-app.set("trust proxy", 1); 
+app.enable("trust proxy");
+app.disable("x-powered-by");
 app.use(rateLimiter()); // register rate-limiter as the very FIRST middleware!!
 app.use(express.json());
 app.use(helmet());
 app.use(cors());
-// app.use(xss());
+app.use(xss());
 
 /* routes */
 app.use("/api/v1/auth", authRouter);
