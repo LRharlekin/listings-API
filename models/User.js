@@ -25,6 +25,19 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
+UserSchema.statics.isThisEmailUnique = async function (email) {
+  try {
+    const user = await this.findOne({ email });
+    if (user) {
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.log("error inside isThisEmailUnique():", error.message);
+    return false;
+  }
+};
+
 UserSchema.pre("save", async function (next) {
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);

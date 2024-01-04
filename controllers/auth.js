@@ -36,6 +36,18 @@ const register = async (req, res) => {
   // }
 
   // See User model: Before .create() this will pass through mongoose pre-save middleware, where hashing is done.
+  // await User.init();
+  const { email: emailRaw } = req.body;
+  const email = emailRaw.toLowerCase();
+
+  const isNewUser = await User.isThisEmailUnique(email);
+
+  if (!isNewUser) {
+    throw new BadRequestError(
+      `The email address ${emailRaw} is already in use, try sign-in.`
+    );
+  }
+
   const user = await User.create({ ...req.body });
 
   const token = user.createJWT();
