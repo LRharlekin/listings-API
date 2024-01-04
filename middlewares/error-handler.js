@@ -18,7 +18,13 @@ const errorHandlerMiddleware = async (err, req, res, next) => {
     customError.msg = Object.values(err.errors)
       .map((item) => item.message)
       .join(" ");
-    customError.statusCode = 400;
+    customError.statusCode = StatusCodes.BAD_REQUEST;
+  }
+
+  if (err.name === "CastError") {
+    // customError.msg = `No item found with id: ${req.params.id}`;
+    customError.msg = `No item found with id: ${err.value}`;
+    customError.statusCode = StatusCodes.NOT_FOUND;
   }
   /* 
 // Handling duplicate email insertion as a mongoDB internal error - DB NOT CONFIGURED YET - Index needs to be built first
@@ -26,7 +32,7 @@ const errorHandlerMiddleware = async (err, req, res, next) => {
     err.msg = `Duplicate value entered for ${Object.keys(
       err.keyValue
     )} field, please choose another value.`;
-    customError.statusCode = 400; // bad request
+    customError.statusCode = StatusCodes.BAD_REQUEST; // bad request
   }
  */
 
