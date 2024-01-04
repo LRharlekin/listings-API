@@ -1,13 +1,20 @@
 require("dotenv").config();
 require("express-async-errors");
+
+/* security packages */
+const helmet = require('helmet');
+const cors require('cors');
+// const xss = require('xss-filters');
+const rateLimiter = require("./middlewares/rate-limiter");
+
 const express = require("express");
 
 const app = express();
-
+ 
 const connectDB = require("./db/connect");
 const authenticateUser = require("./middlewares/authentication");
 
-// require routers
+/* require routers */
 const authRouter = require("./routes/auth");
 const listingsRouter = require("./routes/listings");
 
@@ -15,14 +22,19 @@ const listingsRouter = require("./routes/listings");
 const notFoundMiddleware = require("./middlewares/not-found");
 const errorHandlerMiddleware = require("./middlewares/error-handler");
 
-// pre-hook middlewares
+/* pre-hook middlewares */
+app.set("trust proxy", 1); 
+app.use(rateLimiter()); // register rate-limiter as the very FIRST middleware!!
 app.use(express.json());
+app.use(helmet());
+app.use(cors());
+// app.use(xss());
 
-// routes
+/* routes */
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/listings", authenticateUser, listingsRouter);
 
-// post-hook middlewares
+/* post-hook middlewares */
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
